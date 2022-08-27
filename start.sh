@@ -16,6 +16,11 @@ if [ -z "$AZP_TOKEN_FILE" ]; then
   echo -n $AZP_TOKEN > "$AZP_TOKEN_FILE"
 fi
 
+if [ -n "${AZP_CA_CERT}" ] && [ ! -f "$AZP_CA_CERT" ]; then
+  echo 1>&2 "error: could not open CA certificate at $AZP_CA_CERT"
+  exit 1
+fi
+
 unset AZP_TOKEN
 
 if [ -n "$AZP_WORK" ]; then
@@ -78,6 +83,7 @@ print_header "3. Configuring Azure Pipelines agent..."
   --token $(cat "$AZP_TOKEN_FILE") \
   --pool "${AZP_POOL:-Default}" \
   --work "${AZP_WORK:-_work}" \
+  $([ -n "${AZP_CA_CERT}" ] && echo "--sslcacert ${AZP_CA_CERT}") \
   --replace \
   --acceptTeeEula & wait $!
 
