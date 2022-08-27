@@ -16,9 +16,14 @@ if [ -z "$AZP_TOKEN_FILE" ]; then
   echo -n $AZP_TOKEN > "$AZP_TOKEN_FILE"
 fi
 
-if [ -n "${AZP_CA_CERT}" ] && [ ! -f "$AZP_CA_CERT" ]; then
-  echo 1>&2 "error: could not open CA certificate at $AZP_CA_CERT"
-  exit 1
+if [ -n "${AZP_CA_CERT}" ]; then
+  if [ -f "$AZP_CA_CERT" ]; then
+    cp "$AZP_CA_CERT" /usr/local/share/ca-certificates/private-ca.crt
+    update-ca-certificates
+  else
+    echo 1>&2 "error: could not open CA certificate at $AZP_CA_CERT"
+    exit 1
+  fi
 fi
 
 unset AZP_TOKEN
